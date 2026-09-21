@@ -1,0 +1,8 @@
+{
+  "name": "Copy of feed21",
+  "description": "Moon SSH Direct SSL/SNI, CONNECT Payload & WebSocket Tunnel Server & Telegram Bot Admin",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
