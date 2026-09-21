@@ -1,0 +1,45 @@
+services:
+  ssh-bot:
+    build: .
+    image: ssh-telegram-bot:latest
+    ports:
+      # Port unique (HTTP + WebSocket upgrade -> tunnel SSH). Réglable via PORT.
+      - "${PORT:-3000}:${PORT:-3000}"
+    environment:
+      - PORT=${PORT:-3000}
+      - APP_URL=${APP_URL:-}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_ADMIN_CHAT_ID=${TELEGRAM_ADMIN_CHAT_ID:-}
+      - DATA_DIR=/app/data
+      - TELEGRAM_MODE=${TELEGRAM_MODE:-}
+      - EXTRA_PORTS=${EXTRA_PORTS:-8080,8000,5000,9090}
+      # SSH tunnel credentials -- see .env.example. Change these before
+      # deploying publicly; defaults are vpsuser/vpspass.
+      - SSH_USERNAME=${SSH_USERNAME:-vpsuser}
+      - SSH_PASSWORD=${SSH_PASSWORD:-vpspass}
+    # Nombre de descripteurs de fichiers (sockets) que le conteneur peut
+    # ouvrir en même temps. Chaque utilisateur connecté = au moins 1 socket
+    # WebSocket -- avec potentiellement des milliers d'utilisateurs
+    # simultanés, la limite par défaut du démon Docker (souvent 1024) est
+    # bien trop basse et provoque des échecs de connexion silencieux une
+    # fois ce plafond atteint.
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      # Persiste admin.json/settings.json/clients.json (dossier /app/data,
+      # séparé du code de l'appli pour ne pas masquer /app/dist). Sans ce
+      # volume, ces fichiers vivent uniquement sur le disque éphémère du
+      # conteneur : un redémarrage/redeploy les efface, admin.json revient à
+      # "aucun admin", et le premier message reçu ensuite (de n'importe qui)
+      # devenait silencieusement le nouvel admin principal -- irrévocable.
+      # Toujours définir aussi TELEGRAM_ADMIN_CHAT_ID en variable
+      # d'environnement : le code le traite désormais comme prioritaire sur
+      # ce fichier, donc même une réinitialisation accidentelle du volume ne
+      # peut pas faire perdre la propriété du bot.
+      - ssh_bot_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  ssh_bot_data:
