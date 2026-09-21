@@ -1,0 +1,15 @@
+# Endpoint configuration for Choreo (keep at the root of the build context).
+# The port MUST be the one the app listens on. The app detects it automatically
+# from this file when PORT is not set (Choreo does not inject PORT).
+# 3000 is not one of Choreo's "scale-to-zero" ports, so the bot is not put to
+# sleep automatically when it receives no HTTP traffic.
+schemaVersion: 1.2
+endpoints:
+  - name: ssh-telegram-bot
+    displayName: SSH Telegram Bot
+    service:
+      basePath: /
+      port: 3000
+    type: REST
+    networkVisibilities:
+      - Public
