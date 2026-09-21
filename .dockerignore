@@ -1,0 +1,17 @@
+node_modules
+dist
+npm-debug.log
+.git
+.gitignore
+.env
+.env.local
+*.log
+data
+admin.json
+murad-bot.json
+ssh-credentials.json
+detected-host.json
+Dockerfile
+docker-compose.yml
+README.md
+*.md
